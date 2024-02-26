@@ -6,6 +6,7 @@ const User = require('./database_model/user');
 const bodyParser = require('body-parser');
 const Userlogin = require('./database_model/user_login')
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const path = require('path');
 
 app.set('view engine', 'ejs');
@@ -44,7 +45,9 @@ app.post('/userslogin', async (req, res) => {
     }
     
     // ผู้ใช้พบและรหัสผ่านถูกต้อง
-    res.redirect(`/info?id=${user.ul_id}`);
+    const token = jwt.sign({ id: user.ul_id }, 'yourSecretKey', { expiresIn: '1h' });
+
+    res.redirect(`/info?id=${token}`);
 
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -89,9 +92,11 @@ app.post('/register',async (req,res) =>{
 })
 
 app.get('/info',async (req,res)=>{
-  const id = req.query.id;
 
-  const information = await User.findOne({ where: { user_id: id } });
+  const token = req.query.id;
+  const decoded = jwt.verify(token, 'yourSecretKey');
+
+  const information = await User.findOne({ where: { user_id: decoded.id } });
 
   if (!information) {
     return res.status(404).json({ message: 'ไม่พบผู้ใช้' });
@@ -105,6 +110,7 @@ app.get('/info',async (req,res)=>{
     education:information.user_enducation
   };
   res.render('info', { user });
+  
 
 })
 

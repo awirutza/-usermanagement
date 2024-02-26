@@ -19,12 +19,34 @@ app.use(express.static('public'));
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
+//Set cookie username
+function setLoginCookie(res, username) {
+  const d = new Date();
+  d.setTime(d.getTime() + (24*60*60*1000)); // ตั้งค่าให้คุกกี้หมดอายุใน 1 วัน
+  const expires = "expires=" + d.toUTCString();
+  
+  res.setHeader('Set-Cookie', `username=${username}; ${expires}; path=/`);
+}
+
+//ตรวจสอบว่ามี cookie หรือไม่
+function getCookie(name) {
+  let cookieArray = document.cookie.split(';');
+  for(let i = 0; i < cookieArray.length; i++) {
+      let cookiePair = cookieArray[i].split('=');
+      if(name == cookiePair[0].trim()) {
+          return decodeURIComponent(cookiePair[1]);
+      }
+  }
+  return "";
+}
 
 app.get('/login',(req,res) =>{
   res.sendFile(path.join(__dirname, 'public', 'template', 'login.html'));
 })
 
-
+app.get('/',(req,res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'template', 'main.html'));
+})
 
 app.post('/userslogin', async (req, res) => {
   const { username, password } = req.body;
@@ -42,13 +64,12 @@ app.post('/userslogin', async (req, res) => {
 
     if (!isMatch) {
       return res.status(401).json({ message: 'รหัสผ่านไม่ถูกต้อง' });
+    }else{
+      setLoginCookie(res, user.ul_username);
+      const token = jwt.sign({ id: user.ul_id }, 'yourSecretKey', { expiresIn: '1h' });
+      res.redirect(`/info?id=${token}`);
+
     }
-    
-    // ผู้ใช้พบและรหัสผ่านถูกต้อง
-    const token = jwt.sign({ id: user.ul_id }, 'yourSecretKey', { expiresIn: '1h' });
-
-    res.redirect(`/info?id=${token}`);
-
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

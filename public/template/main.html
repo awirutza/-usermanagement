@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>นี้หน้าแรก</h1>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3"></script>
+    <script>
+        function checkLoginStatus() {
+            // ใช้ js-cookie ในการอ่านค่าคุกกี้
+            let username = Cookies.get("username");
+            if (username) {
+                alert("Welcome again, " + username);
+                // ผู้ใช้ได้ล็อกอินแล้ว
+            } else {
+                // ผู้ใช้ยังไม่ได้ล็อกอิน, เปลี่ยนเส้นทางไปยังหน้าล็อกอิน
+                window.location.replace("/login.html");
+            }
+        }
+        checkLoginStatus();
+    </script>
+</body>
+</html>

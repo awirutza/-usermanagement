@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/css/info.css">
+</head>
+<body>
+    <div class="profile-container">
+        <h2>User Profile</h2>
+        <div class="profile-info">
+            <p><strong>First Name:</strong> <span id="fname"><%= user.fname %></span></p>
+            <p><strong>Last Name:</strong> <span id="lname"><%= user.lname %></span></p>
+            <p><strong>Sex:</strong> <span id="sex"><%= user.sex %></span></p>
+            <p><strong>Email:</strong> <span id="mail"><%= user.mail %></span></p>
+            <p><strong>Address:</strong> <span id="address"><%= user.address %></span></p>
+            <p><strong>Education:</strong> <span id="education"><%= user.education %></span></p>
+        </div>
+    </div>
+</body>
+</html>

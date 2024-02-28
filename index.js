@@ -8,6 +8,12 @@ const Userlogin = require('./database_model/user_login')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
+const {google} = require('googleapis');
+
+
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'public', 'template'));
@@ -18,6 +24,51 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
+
+passport.use(new GoogleStrategy({
+  clientID: '40728501087-emgstpsl1a5pc0rsqtrl8f7k08jhjsef.apps.googleusercontent.com',
+  clientSecret: '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',
+  callbackURL: "http://localhost:3000/auth/google/callback"
+},
+function(accessToken, refreshToken, profile, cb) {
+  // ในส่วนนี้, ใช้ profile ที่ได้จาก Google ในการค้นหาหรือสร้าง user ในฐานข้อมูลของคุณ
+  return cb(null, profile);
+}
+));
+
+
+app.use(session({
+  secret: 'your secret key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+
+// ใช้ session กับ Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Authentication สำเร็จ, redirect ไปยังหน้าแรก
+    console.log('User profile:', req.user.profile[0].value);
+    console.log('User email:', req.user.emails[0].value); // ตัวอย่างการเข้าถึงอีเมล์
+    res.redirect('/');
+});
+
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
 //Set cookie username
 function setLoginCookie(res, username) {

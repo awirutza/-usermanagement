@@ -20,8 +20,20 @@
             </div>
             <button type="submit">Login</button>
             <p class="message">Not registered? <a href="/register-user">Create an account</a></p>
+            <p id="OAuth-Google">ลงชื่อเข้าใช้ด้วย Google</p>
         </form>
     </div>
-    <script src="script.js"></script>
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+            // หา element ที่มี id ว่า 'OAuth-Google'
+            var googleAuthElement = document.getElementById('OAuth-Google');
+
+            // เพิ่ม event listener สำหรับการคลิก
+            googleAuthElement.addEventListener('click', function() {
+                // เปลี่ยนไปยัง URL '/aoogle'
+                window.location.href = '/auth/google';
+            });
+        });
+    </script>
 </body>
 </html>
